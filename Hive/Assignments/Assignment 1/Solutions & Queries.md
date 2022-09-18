@@ -14,7 +14,7 @@
 
 Used File Zilla to transfer file into lfs
 
-hadoop fs -mkdir /tmp/assignment
+hadoop fs -mkdir /tmp/assignment<br>
 hadoop fs -put sales_order_data.csv /tmp/assignment
 
 ### CREATING A CSV TABLE WITH SCHEMA AND DATATYPE RELATED TO THE ABOVE DATASET
