@@ -1,1 +1,160 @@
+# HIVE
+## BRIEF DESCRIPTION
 
+<B>This assignment was performed to develop and check skills for HDFS and Hive like:</b>
+    <ol>
+     <li>copying/moving files from lfs to hdfs</li>
+      <li>creating table in hive</li>
+     <li>loading data to a ORC format table</li>
+      <li>performing basic queries</li>
+  </ol>
+
+
+### LOADING DATA FROM HOST SYSTEM TO LFS AND THEN TO HDFS
+
+Used File Zilla to transfer file into lfs
+
+hadoop fs -mkdir /tmp/assignment
+hadoop fs -put sales_order_data.csv /tmp/assignment
+
+### CREATING A CSV TABLE WITH SCHEMA AND DATATYPE RELATED TO THE ABOVE DATASET
+
+```
+create table sales_order_csv
+(
+ORDERNUMBER int,
+QUANTITYORDERED int,
+PRICEEACH float,
+ORDERLINENUMBER int,
+SALES float,
+STATUS string,
+QTR_ID int,
+MONTH_ID int,
+YEAR_ID int,
+PRODUCTLINE string,
+MSRP int,
+PRODUCTCODE string,
+PHONE string,
+CITY string,
+STATE string,
+POSTALCODE string,
+COUNTRY string,
+TERRITORY string,
+CONTACTLASTNAME string,
+CONTACTFIRSTNAME string,
+DEALSIZE string
+)
+row format delimited
+fields terminated by ','
+tblproperties("skip.header.line.count"="1")
+; 
+```
+
+### LOADING DATA FROM HDFS TO sales_order_csv</b>
+
+load data inpath '/tmp/assignment/' into table sales_order_csv;
+
+### CREATING AN ORC TABLE WITH SCHEMA SIMILAR TO CSV
+
+```
+create table sales_order_orc
+(
+ORDERNUMBER int,
+QUANTITYORDERED int,
+PRICEEACH float,
+ORDERLINENUMBER int,
+SALES float,
+STATUS string,
+QTR_ID int,
+MONTH_ID int,
+YEAR_ID int,
+PRODUCTLINE string,
+MSRP int,
+PRODUCTCODE string,
+PHONE string,
+CITY string,
+STATE string,
+POSTALCODE string,
+COUNTRY string,
+TERRITORY string,
+CONTACTLASTNAME string,
+CONTACTFIRSTNAME string,
+DEALSIZE string
+)
+stored as orc;
+```
+
+### LOADING DATA FROM sales_order_csv TO sales_order_orc
+from sales_order_csv insert overwrite table sales_order_orc select *;
+
+### QUERIES
+  
+a.Calculate total sales per year:
+```
+select year_id, sum(sales) as total_sales from sales_order_orc group by year_id;
+```
+year_id total_sales
+2003    3516979.547241211
+2004    4724162.593383789
+2005    1791486.7086791992
+
+
+
+b.Find a product for which maximum orders were placed:
+```
+select sum(quantityordered) as total_orders, productline from sales_order_orc group by productline order by total_orders desc limit 1;
+```
+total_orders    productline
+33992   Classic Cars
+
+c.Calculate the total sales for each quarter:
+```
+select qtr_id, sum(sales) as total_sales from sales_order_orc group by qtr_id;
+```
+qtr_id  total_sales
+1       2350817.726501465
+2       2048120.3029174805
+3       1758910.808959961
+4       3874780.010925293
+
+d.In which quarter sales was minimum:
+```
+select qtr_id, sum(sales) as total_sales from sales_order_orc group by qtr_id order by total_sales asc limit 1;
+```
+qtr_id  total_sales
+3       1758910.808959961
+
+e.In which country sales was maximum and in which country sales was minimum:
+```
+select country, sum(sales) as total_sales from sales_order_orc group by country order by total_sales asc limit 1 union all select country, sum(sales) as total_sales from sales_order_orc group by country order by total_sales desc limit 1;
+```
+_u1.country     _u1.total_sales
+Ireland 57756.43029785156 >>>>>>> Minimum Sales
+USA     3627982.825744629 >>>>>>> Maximum Sales
+
+
+f.Calculate quartelry sales for each city:
+```
+select city, qtr_id, sum(sales) as total_sales from sales_order_orc group by city,qtr_id limit 10;
+```
+city    qtr_id  total_sales
+Aaarhus 4       100595.5498046875
+Allentown       2       6166.7998046875
+Allentown       3       71930.61041259766
+Allentown       4       44040.729736328125
+Barcelona       2       4219.2001953125
+Barcelona       4       74192.66003417969
+Bergamo 1       56181.320068359375
+Bergamo 4       81774.40008544922
+Bergen  3       16363.099975585938
+Bergen  4       95277.17993164062
+
+
+g.Find a month for each year in which maximum number of quantities were sold:
+```
+select year_id,month_id,total_sales from (select year_id, month_id,total_sales,dense_rank() over (partition by year_id order by total_sales desc) as level from(select year_id,month_id,sum(sales) as total_sales from sales_order_orc group by year_id,month_id)t1)t2 where level =1;
+```
+year_id month_id        total_sales
+2003    11      1029837.6627197266
+2004    11      1089048.0076293945
+2005    5       457861.06036376953
