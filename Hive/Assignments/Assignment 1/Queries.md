@@ -1,4 +1,4 @@
-# HIVE
+# HIVE ASSIGNMENT
 ## BRIEF DESCRIPTION
 
 <B>This assignment was performed to develop and check skills for HDFS and Hive like:</b>
