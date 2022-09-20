@@ -194,6 +194,13 @@ uci.date      uci.time       uci.co_gt      uci.pt08_s1_co   uci.nmhc_gt    uci.
 
 #### 4. Fetch the result of the select operation in your local as a csv file . 
 ```
+vim demo.hql
+	 select * from sales_order_csv limit 10;
+and then save:
+
+echo 'select * from hive_class_b1.sales_order_csv;' | cat > sales.hql
+hive -e 'select * from challenge.sales_order_csv limit 10' > /home/cloudera/anas/sales2.csv;
+hive -f sales.hql > /home/cloudera/anas/salea.csv;
 
 
 ```
@@ -412,6 +419,7 @@ time           c6h6
 #### 18 . table view operation you have to perform. 
 
 ```
+create view airquality_view as select * from airqualityuci where date = '12/12/2001';
 
 ```
 
