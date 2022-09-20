@@ -152,7 +152,7 @@ FULL OUTER JOIN:
 #### 1. Create a hive table as per given schema in your dataset 
 ```
 	create table airqualityuci
-  (
+        (
 	date string, 
 	time string, 
 	co_gt float, 
@@ -171,7 +171,6 @@ FULL OUTER JOIN:
 	) 
 	row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 	with serdeproperties
-  (<br>
 	"separatorChar"= "\;",
 	"escapeChar"= "\\"
 	)
@@ -203,7 +202,7 @@ uci.date      uci.time       uci.co_gt      uci.pt08_s1_co   uci.nmhc_gt    uci.
 #### 5. Perform group by operation . 
 
 ```
-	select date, time, t, co_gt  from airqualityuci uci group by date,time,t,co_gt limit 10;
+	select date, time, t, co_gt  from airqualityuci group by date,time,t,co_gt limit 10;
 
 	uci.date  &nbsp;  	uci.time &nbsp;   uci.t  &nbsp;     uci.co_gt
 	01/01/2005  &nbsp;    00.00.00    &nbsp;    8.2   &nbsp;  -200
@@ -222,7 +221,7 @@ uci.date      uci.time       uci.co_gt      uci.pt08_s1_co   uci.nmhc_gt    uci.
 #### 7. Perform filter operation at least 5 kinds of filter examples . 
 	
 ```
-	select date,time,t,co_gt from airqualityuci uci where date = '19/03/2004' group by date,time,t,co_gt limit 10;
+	select date,time,t,co_gt from airqualityuci where date = '19/03/2004' group by date,time,t,co_gt limit 10;
 
 
 	uci.date	uci.time	uci.t		uci.co_gt	
@@ -242,6 +241,8 @@ uci.date      uci.time       uci.co_gt      uci.pt08_s1_co   uci.nmhc_gt    uci.
 #### 8. show and example of regex operation
 
 ```
+select * from airqualityuci where ah regexp '^0.66';
+
 uci.date      uci.time      uci.co_gt    uci.pt08_s1_co  uci.nmhc_gt    uci.c6h6_gt   uci.pt08_s2_nmhc      uci.nox_gt     uci.pt08_s3_  nox uci.no2_gt     uci.pt08_s4_no2 uci.pt08_s5_o3     uci.t  uci.rh  uci.ah
 11-03-2004      23:00:00        [1]     913     26      2.6     629     47      1565    53  1252     552     8.2     60.8    0.6657
 12-03-2004      15:00:00        [2]     1353    185     14.2    1122    190     922     126 1740     1139    15.8    37.0    0.661
@@ -254,7 +255,7 @@ uci.date      uci.time      uci.co_gt    uci.pt08_s1_co  uci.nmhc_gt    uci.c6h6
 #### 9. alter table operation 
 ```
 
-	alter table airqualityuci change date day string;
+alter table airqualityuci change date day string;
 	
 	uci.day		uci.time 	uci.t 	uci.co_gt
 	01/01/2005      00.00.00        8.2     -200
@@ -263,7 +264,9 @@ uci.date      uci.time      uci.co_gt    uci.pt08_s1_co  uci.nmhc_gt    uci.c6h6
 
 #### 10 . drop table operation
 ```
-	drop table airqualityuci;
+create table air_quali_bkup_csv as select * from airqualityuci;
+
+drop table air_quali_bkup_csv;
   
 ```
 
@@ -271,7 +274,7 @@ uci.date      uci.time      uci.co_gt    uci.pt08_s1_co  uci.nmhc_gt    uci.c6h6
 
 ```
 	
-	select day, time from airqualityuci uci group by day,time order by time limit 10;
+select day, time from airqualityuci group by day,time order by time limit 10;
 	
 	day     time
 
@@ -292,7 +295,7 @@ uci.date      uci.time      uci.co_gt    uci.pt08_s1_co  uci.nmhc_gt    uci.c6h6
 
 ```
 	
-select date,time,t,co_gt from airqualityuci uci where date = '19/03/2004' group by date,time,t,co_gt limit 10;
+select date,time,t,co_gt from airqualityuci where date = '19/03/2004' group by date,time,t,co_gt limit 10;
 
 
 	uci.date	uci.time	uci.t		uci.co_gt	
@@ -312,7 +315,7 @@ select date,time,t,co_gt from airqualityuci uci where date = '19/03/2004' group 
 #### 14 . sorting operation you have to perform. 
 
 ```
-select day, time, co_gt from airqualityuci uci sort by day, time;
+select day, time, co_gt from airqualityuci sort by day, time;
 uci.day 	uci.time	uci.co_gt
 31/03/2005      16.00.00        1.1
 31/03/2005      17.00.00        1.5
@@ -337,7 +340,7 @@ uci.day 	uci.time	uci.co_gt
 #### 15 . distinct operation you have to perform. 
 
 ```
-select distinct(day) from airqualityuci uci ;
+select distinct(day) from airqualityuci;
 
        	01/01/2005
 	01/02/2005
@@ -361,7 +364,7 @@ select distinct(day) from airqualityuci uci ;
 #### 16 . like an operation you have to perform . 
 		
 ```
-select distinct(day) from airqualityuci uci where day like '%2004';
+select distinct(day) from airqualityuci where day like '%2004';
 
 	01/04/2004
 	01/05/2004
