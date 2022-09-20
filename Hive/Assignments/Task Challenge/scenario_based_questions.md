@@ -54,9 +54,9 @@ How will you consume this CSV file into the Hive warehouse using built-in SerDe?
 	STORED AS TEXTFILE
 	TBLPROPERTIES("SKIP.HEADER.LINE.COUNT" = "1");
 
-	load data from local-->
+	load data from local:
 
-	load data local inpath 'file:///tmp/SAMPLE.csv' into table csv_table;
+	load data local inpath 'file:///tmp/hive_class/sample.csv' into table csv_table;
 
 ```
 
