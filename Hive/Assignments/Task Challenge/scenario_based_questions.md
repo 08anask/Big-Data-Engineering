@@ -204,16 +204,16 @@ uci.date      uci.time       uci.co_gt      uci.pt08_s1_co   uci.nmhc_gt    uci.
 ```
 	select date, time, t, co_gt  from airqualityuci group by date,time,t,co_gt limit 10;
 
-	uci.date  &nbsp;  	uci.time &nbsp;   uci.t  &nbsp;     uci.co_gt
-	01/01/2005  &nbsp;    00.00.00    &nbsp;    8.2   &nbsp;  -200
-	01/01/2005   &nbsp;   01.00.00    &nbsp;    5.3   &nbsp;  1.6
-	01/01/2005   &nbsp;   02.00.00    &nbsp;    5.9   &nbsp;  2.5
-	01/01/2005   &nbsp;   03.00.00    &nbsp;    4.9   &nbsp;  2.7
-	01/01/2005   &nbsp;   04.00.00    &nbsp;    4.3   &nbsp;  1.9
-	01/01/2005    &nbsp;  05.00.00    &nbsp;    4.2   &nbsp;  1.4
-	01/01/2005   &nbsp;   06.00.00    &nbsp;    3.5   &nbsp;  1.5
-	01/01/2005    &nbsp;  07.00.00    &nbsp;    3.0   &nbsp;  1.4
-	01/01/2005   &nbsp;   08.00.00    &nbsp;    2.6   &nbsp;  1.1
+	uci.date  	uci.time    uci.t      uci.co_gt
+	01/01/2005     00.00.00       8.2    -200
+	01/01/2005     01.00.00        5.3     1.6
+	01/01/2005      02.00.00        5.9     2.5
+	01/01/2005     03.00.00       4.9     2.7
+	01/01/2005     04.00.00        4.3     1.9
+	01/01/2005      05.00.00       4.2     1.4
+	01/01/2005      06.00.00       3.5    1.5
+	01/01/2005      07.00.00        3.0     1.4
+	01/01/2005     08.00.00       2.6    1.1
 
 
 ```
@@ -244,11 +244,11 @@ uci.date      uci.time       uci.co_gt      uci.pt08_s1_co   uci.nmhc_gt    uci.
 select * from airqualityuci where ah regexp '^0.66';
 
 uci.date      uci.time      uci.co_gt    uci.pt08_s1_co  uci.nmhc_gt    uci.c6h6_gt   uci.pt08_s2_nmhc      uci.nox_gt     uci.pt08_s3_  nox uci.no2_gt     uci.pt08_s4_no2 uci.pt08_s5_o3     uci.t  uci.rh  uci.ah
-11-03-2004      23:00:00        [1]     913     26      2.6     629     47      1565    53  1252     552     8.2     60.8    0.6657
-12-03-2004      15:00:00        [2]     1353    185     14.2    1122    190     922     126 1740     1139    15.8    37.0    0.661
-12-03-2004      16:00:00        [2]     1309    165     12.7    1073    178     954     120 1657     1112    15.9    37.2    0.6657
-22-03-2004      15:00:00        [2]     1094    -200    10.7    1003    130     965     99  1574     813     21.3    26.8    0.6681
-22-03-2004      17:00:00        [2]     1152    185     12.4    1062    138     928     103 1606     850     20.2    28.5    0.6682
+11-03-2004      23:00:00        1.4    913     26      2.6     629     47      1565    53  1252     552     8.2     60.8    0.6657
+12-03-2004      15:00:00        2.3     1353    185     14.2    1122    190     922     126 1740     1139    15.8    37.0    0.661
+12-03-2004      16:00:00        2.7     1309    165     12.7    1073    178     954     120 1657     1112    15.9    37.2    0.6657
+22-03-2004      15:00:00        2.1     1094    -200    10.7    1003    130     965     99  1574     813     21.3    26.8    0.6681
+22-03-2004      17:00:00        2.7     1152    185     12.4    1062    138     928     103 1606     850     20.2    28.5    0.6682
 
 ```
 
@@ -384,7 +384,28 @@ select distinct(day) from airqualityuci where day like '%2004';
 #### 17 . union operation you have to perform. 
 
 ```
+select distinct(time), c6h6 from airqualityuci where time = '10:00:00'  limit 10 union all select distinct(time), c6h6 from airqualityuci where time = '11:00:00'  limit 10;
 
+time           c6h6
+10:00:00        2.8
+10:00:00        2.7
+10:00:00        2.6
+10:00:00        2.5
+10:00:00        2.3
+10:00:00        2.0
+10:00:00        1.9
+10:00:00        1.4
+10:00:00        0.5
+10:00:00        -200.0
+11:00:00        3.2
+11:00:00        3.1
+11:00:00        3.0
+11:00:00        2.7
+11:00:00        2.6
+11:00:00        2.5
+11:00:00        2.3
+11:00:00        2.0
+11:00:00        0.6
 ```
 
 
@@ -400,7 +421,7 @@ select distinct(day) from airqualityuci where day like '%2004';
 
 
 
-HIVE OPERATION WITH PYTHON
+### HIVE OPERATION WITH PYTHON
 
 Create a python application that connects to the Hive database for extracting data, 
 creating sub tables for data processing, drops temporary tables.fetch rows to python itself into a list of tuples and mimic the join or filter operations
