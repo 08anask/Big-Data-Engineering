@@ -359,25 +359,28 @@ select Violation_Code, count(*) as TicketsIssued from park_viol_part_buck where 
 ```
 select from_unixtime(unix_timestamp(regexp_extract(violation_time,'(.*)[A-Z]',1),'HHmm'),"HH:mm") as data from violations_parking limit 7;
 ```
-01:43
-04:00
-12:11
-12:17
-12:07
-10:37
-01:01
+01:43<br>
+04:00<br>
+12:11<br>
+12:17<br>
+12:07<br>
+10:37<br>
+01:01<br>
 
 ```
 select from_unixtime(unix_timestamp(concat(violation_time,'M'), 'HHmmaaa'),"HH:mmaaa") as data from violations_parking limit 7;
 ```
-01:43AM
-04:00AM
-12:11PM
-12:17PM
-12:07PM
-10:37AM
-01:01AM
+01:43AM<br>
+04:00AM<br>
+12:11PM<br>
+12:17PM<br>
+12:07PM<br>
+10:37AM<br>
+01:01AM<br>
 
+### 6. Divide 24 hours into 6 equal discrete bins of time. The intervals you choose are at your discretion. For each of these groups, find the 3 most commonly occurring violations
+
+Create a Partitioned View:
 ```
 create view park_viol_part_view partitioned on (Violation_Code) as
 select Summons_Number, Violation_Time, Issuer_Precinct,
@@ -393,19 +396,29 @@ from park_viol_part_buck
 where Violation_Time is not null or (length(Violation_Time)=5 and upper(substring(Violation_Time,-1))in ('A','P')
 and substring(Violation_Time,1,2) in ('00','01','02','03','04','05','06','07', '08','09','10','11','12'));
 ```
-
+```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 1 group by Violation_Code order by TicketsIssued desc limit 3;
+```
+```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 2 group by Violation_Code order by TicketsIssued desc limit 3;
+```
+```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 3 group by Violation_Code order by TicketsIssued desc limit 3;
+```
+```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 4 group by Violation_Code order by TicketsIssued desc limit 3;
+```
+```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 5 group by Violation_Code order by TicketsIssued desc limit 3;
+```
+```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 6 group by Violation_Code order by TicketsIssued desc limit 3;
-
-
+```
+```
 select Violation_Time_bin, count(*) TicketsIssued from park_viol_part_view where Violation_Code in (21,36,37,38) group by Violation_Time_bin order by TicketsIssued desc limit 3;
+```
 
-
-
+```
 create view tickets_issued_view as
 select Violation_Code , Issuer_Precinct,
 case
@@ -415,8 +428,8 @@ when MONTH(Issue_Date) between 09 and 11 then 'autumn'
 when MONTH(Issue_Date) in (1,2,12) then 'winter'
 else 'unknown' end  as season 
 from violations_parking;
-	
-	
+```	
+```	
 create view tickets_issued_view_part partitioned on (Violation_Code) as
 select Issuer_Precinct,
 case
@@ -426,14 +439,19 @@ when MONTH(Issue_Date) between 09 and 11 then 'autumn'
 when MONTH(Issue_Date) in (1,2,12) then 'winter'
 else 'unknown' end  as season,Violation_Code from
 violations_parking;
-	
-	
+```	
+```	
 select season, count(*) as TicketsIssued from tickets_issued_view_part group by season order by TicketsIssued desc;
-
+```
+```
 select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'spring' group by Violation_Code order by TicketsIssued desc limit 6;
-
+```
+```
 select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'summer' group by Violation_Code order by TicketsIssued desc limit 6;
-
+```
+```
 select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'autumn' group by Violation_Code order by TicketsIssued desc limit 6;
-
+```
+```
 select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'winter' group by Violation_Code order by TicketsIssued desc limit 6;
+```
