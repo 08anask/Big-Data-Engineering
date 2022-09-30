@@ -328,7 +328,7 @@ select Violation_Code, count(*) as TicketsIssued from park_viol_part_buck where 
 42   &nbsp;&nbsp;&nbsp;   6190<br>
 38   &nbsp;&nbsp;&nbsp;   6176<br>
 
-##### Issuer Precinct 18:
+##### Issuer Precinct 19:
 
 ```
 select Violation_Code, count(*) as TicketsIssued from park_viol_part_buck where Issuer_Precinct=19 group by Violation_Code order by TicketsIssued desc limit 7;
