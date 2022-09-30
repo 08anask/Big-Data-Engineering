@@ -1,3 +1,7 @@
+Download the dataset from the mentioned links:
+```
+https://data.cityofnewyork.us/browse?q=parking+tickets
+```
 ```
 create table parking_violations
 (
@@ -49,6 +53,10 @@ fields terminated by ','
 tblproperties ("skip.header.line.count" = "1");
 ```
 ```
+load data inpath '/tmp/assignments/' into table parking_violations;
+```
+as the above table uses string datatype for dates, so in order to correct that a new table is created with the required datatype...
+```
 create table violations_parking
 (
 Summons_Number bigint,
@@ -97,6 +105,7 @@ Double_Parking_Violation string)
 row format delimited
 fields terminated by ',';
 ```
+insert the data from the parking_violations table into violations_parking table
  ```
  insert overwrite table violations_parking select
  Summons_Number bigint,
@@ -144,6 +153,7 @@ fields terminated by ',';
  Double_Parking_Violation string
  from parking_violations;
  ```
+ Now create a partition and bucketing of a table...
 ``` 
 create table park_viol_part_buck
 (
@@ -196,11 +206,13 @@ row format delimited
 fields terminated by ','
 tblproperties ("skip.header.line.count" = "1");
 ```
+Before loading the data into the above table some properties are needed to be set...
 ```
 set hive.exec.dynamic.partition=true;
 set hive.exec.dynamic.partition.mode=nonstrict; 
 set hive.enforce.bucketing = true;
 ```
+Now insert the data into the parted and bucketed table from the violations parking table
 ```
 insert into park_viol_part_buck partition(Violation_County) select
 Summons_Number,Plate_ID,Registration_State,Plate_Type,Issue_Date,Violation_Code,
@@ -215,23 +227,60 @@ Violation_Description,No_Standing_or_Stopping_Violation,Hydrant_Violation,
 Double_Parking_Violation,Violation_County from violations_parking
 where year(Issue_Date) = '2017';
 ```
+## Part-I: Examine the data
 
+### 1. Find the total number of tickets for the year.
+```
 select count(distinct Summons_Number) Tickets_Total ,year(Issue_Date) as year from park_viol_part_buck group by year(Issue_Date);
- 
+```
+5432898  &nbsp;&nbsp;&nbsp; 2017
+
+### 2. Find out how many unique states the cars which got parking tickets came from.
+```
 select count(distinct Registration_State) as No_of_States from park_viol_part_buck;
 select Registration_State, Count(1) as Number_of_Records from park_viol_part_buck  group by Registration_State order by Number_of_Records;
+```
+65
 
-
+### 3. Some parking tickets don’t have addresses on them, which is cause for concern. Find out how many such tickets there are(i.e. tickets where either "Street Code 1" or "Street Code 2" or "Street Code 3" is empty )
+```
 select count(distinct summons_number) as No_Tickets_without_address from violations_parking  where Street_code1 = 0 or Street_code2 = 0 or Street_code3 = 0;
+```
+3667515
 
+## Part-II: Aggregation tasks
 
-
-
-
+### 1.How often does each violation code occur? (frequency of violation codes - find the top 5)
+```
 select count(Violation_Code) as frequency_of_violation,Violation_Code from park_viol_part_buck group by Violation_Code order by frequency_of_violation desc limit 5;
+```
+768276 &nbsp;&nbsp;&nbsp; 21<br>
+662760 &nbsp;&nbsp;&nbsp; 36<br>
+542088 &nbsp;&nbsp;&nbsp; 38<br>
+476756 &nbsp;&nbsp;&nbsp; 14<br>
+319720 &nbsp;&nbsp;&nbsp; 20<br>
 
+### 2. How often does each vehicle body type get a parking ticket? How about the vehicle make? (find the top 5 for both)
+```
 select Vehicle_Body_Type,count(summons_number)as frequency_of_getting_parking_ticket  from park_viol_part_buck group by Vehicle_Body_Type order by frequency_of_getting_parking_ticket desc limit 5;
+```
+SUBN  &nbsp;&nbsp;&nbsp;  1884255<br>
+4DSD  &nbsp;&nbsp;&nbsp;  1547293<br>
+VAN   &nbsp;&nbsp;&nbsp;  724142<br>
+DELV  &nbsp;&nbsp;&nbsp;  359069<br>
+SDN   &nbsp;&nbsp;&nbsp;  194597<br>
+```
+select Vehicle_Make,count(summons_number)as frequency_of_getting_parking_ticket from park_viol_part_buck group by Vehicle_Make order by frequency_of_getting_parking_ticket desc limit 5; 
+```
+FORD  &nbsp;&nbsp;&nbsp;  636948<br>
+TOYOT  &nbsp;&nbsp;&nbsp; 605395<br>
+HONDA  &nbsp;&nbsp;&nbsp; 538987<br>
+NISSA  &nbsp;&nbsp;&nbsp; 462108<br>
+CHEVR  &nbsp;&nbsp;&nbsp; 356095<br>
+
+```
 select Vehicle_make,count(summons_number)as frequency_of_getting_parking_ticket from park_viol_part_buck group by Vehicle_make order by frequency_of_getting_parking_ticket desc limit 5;
+```
 
 a.
 select Violation_Precinct,count(*) as IssuedTicket from violations_parking group by  Violation_Precinct order by IssuedTicket desc limit 6;
