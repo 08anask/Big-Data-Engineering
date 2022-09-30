@@ -105,7 +105,7 @@ Double_Parking_Violation string)
 row format delimited
 fields terminated by ',';
 ```
-insert the data from the parking_violations table into violations_parking table
+Insert the data from the parking_violations table into violations_parking table
  ```
  insert overwrite table violations_parking select
  Summons_Number bigint,
@@ -153,7 +153,7 @@ insert the data from the parking_violations table into violations_parking table
  Double_Parking_Violation string
  from parking_violations;
  ```
- Now create a partition and bucketing of a table...
+ Now create a partition and bucketing of a table as this improves the execution speed of queries as the data size is big...
 ``` 
 create table park_viol_part_buck
 (
@@ -452,7 +452,8 @@ select Violation_Time_bin, count(*) TicketsIssued from park_viol_part_view where
 4    &nbsp;&nbsp;&nbsp;   768743<br>
 5    &nbsp;&nbsp;&nbsp;   186997<br>
 
-
+### 8. Let’s try and find some seasonality in this data
+#### a. First, divide the year into some number of seasons, and find frequencies of tickets for each season. (Hint: A quick Google search reveals the following seasons in NYC: Spring(March, April, March); Summer(June, July, August); Fall(September, October, November); Winter(December, January, February))
 ```
 create view tickets_issued_view as
 select Violation_Code , Issuer_Precinct,
@@ -464,6 +465,7 @@ when MONTH(Issue_Date) in (1,2,12) then 'winter'
 else 'unknown' end  as season 
 from violations_parking;
 ```	
+Create a partitioned view of the above view, again to increase the query execution performance...
 ```	
 create view tickets_issued_view_part partitioned on (Violation_Code) as
 select Issuer_Precinct,
@@ -478,15 +480,35 @@ violations_parking;
 ```	
 select season, count(*) as TicketsIssued from tickets_issued_view_part group by season order by TicketsIssued desc;
 ```
+Spring &nbsp;&nbsp;&nbsp;	2958420<br>
+Winter &nbsp;&nbsp;&nbsp;	1562390<br>
+Summer &nbsp;&nbsp;&nbsp;	855690<br>
+autumn &nbsp;&nbsp;&nbsp;	0<br>
+
+
+#### b. Then, find the 3 most common violations for each of these seasons.
 ```
-select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'spring' group by Violation_Code order by TicketsIssued desc limit 6;
+select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'spring' group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+21 &nbsp;&nbsp;&nbsp;	401250<br>
+36 &nbsp;&nbsp;&nbsp;	365231<br>
+38 &nbsp;&nbsp;&nbsp;	265859<br>
+
 ```
-select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'summer' group by Violation_Code order by TicketsIssued desc limit 6;
+select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'summer' group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+21 &nbsp;&nbsp;&nbsp;	234562<br>
+36 &nbsp;&nbsp;&nbsp;	222369<br>
+38 &nbsp;&nbsp;&nbsp;	181258<br>
+
 ```
-select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'autumn' group by Violation_Code order by TicketsIssued desc limit 6;
+select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'autumn' group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+21 &nbsp;&nbsp;&nbsp;	136521<br>
+36 &nbsp;&nbsp;&nbsp;	95365<br>
+38 &nbsp;&nbsp;&nbsp;	83321<br>
+
 ```
-select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'winter' group by Violation_Code order by TicketsIssued desc limit 6;
+select Violation_Code, count(*) as TicketsIssued from tickets_issued_view_part where season = 'winter' group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+No Output
