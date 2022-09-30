@@ -1,3 +1,4 @@
+```
 create table parking_violations
 (
 Summons_Number bigint,
@@ -46,7 +47,8 @@ Double_Parking_Violation string)
 row format delimited
 fields terminated by ','
 tblproperties ("skip.header.line.count" = "1");
-     
+```
+```
 create table violations_parking
 (
 Summons_Number bigint,
@@ -94,8 +96,8 @@ Hydrant_Violation string,
 Double_Parking_Violation string)
 row format delimited
 fields terminated by ',';
-
- 
+```
+ ```
  insert overwrite table violations_parking select
  Summons_Number bigint,
  Plate_ID string,
@@ -141,8 +143,8 @@ fields terminated by ',';
  Hydrant_Violation string,
  Double_Parking_Violation string
  from parking_violations;
- 
- 
+ ```
+``` 
 create table park_viol_part_buck
 (
 Summons_Number bigint,
@@ -193,13 +195,13 @@ sorted by(Violation_Code) into 8 buckets
 row format delimited
 fields terminated by ','
 tblproperties ("skip.header.line.count" = "1");
-
-
+```
+```
 set hive.exec.dynamic.partition=true;
 set hive.exec.dynamic.partition.mode=nonstrict; 
 set hive.enforce.bucketing = true;
-
-
+```
+```
 insert into park_viol_part_buck partition(Violation_County) select
 Summons_Number,Plate_ID,Registration_State,Plate_Type,Issue_Date,Violation_Code,
 Vehicle_Body_Type,Vehicle_Make,Issuing_Agency,Street_Code1,Street_Code2,
@@ -212,7 +214,7 @@ Unregistered_Vehicle,Vehicle_Year,Meter_Number,Feet_From_Curb,Violation_Post_Cod
 Violation_Description,No_Standing_or_Stopping_Violation,Hydrant_Violation,
 Double_Parking_Violation,Violation_County from violations_parking
 where year(Issue_Date) = '2017';
-
+```
 
 select count(distinct Summons_Number) Tickets_Total ,year(Issue_Date) as year from park_viol_part_buck group by year(Issue_Date);
  
