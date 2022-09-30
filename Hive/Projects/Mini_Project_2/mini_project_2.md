@@ -278,33 +278,107 @@ HONDA  &nbsp;&nbsp;&nbsp; 538987<br>
 NISSA  &nbsp;&nbsp;&nbsp; 462108<br>
 CHEVR  &nbsp;&nbsp;&nbsp; 356095<br>
 
+### 3. A precinct is a police station that has a certain zone of the city under its command. Find the (5 highest) frequencies of:
+
+#### a. Violating Precincts (this is the precinct of the zone where the violation occurred)
 ```
-select Vehicle_make,count(summons_number)as frequency_of_getting_parking_ticket from park_viol_part_buck group by Vehicle_make order by frequency_of_getting_parking_ticket desc limit 5;
+select Violation_Precinct,count(*) as IssuedTicket from violations_parking group by  Violation_Precinct order by IssuedTicket desc limit 5;
 ```
+0    &nbsp;&nbsp;&nbsp;   2072400<br>
+19   &nbsp;&nbsp;&nbsp;   535671<br>
+14   &nbsp;&nbsp;&nbsp;   352450<br>
+1    &nbsp;&nbsp;&nbsp;   331810<br>
+18   &nbsp;&nbsp;&nbsp;   306920<br>
 
-a.
-select Violation_Precinct,count(*) as IssuedTicket from violations_parking group by  Violation_Precinct order by IssuedTicket desc limit 6;
+#### b. Issuer Precincts (this is the precinct that issued the ticket)
+```
+select Issuer_Precinct,count(*) as IssuedTicket from violations_parking group by Issuer_Precinct order by IssuedTicket desc limit 5;
+```
+0    &nbsp;&nbsp;&nbsp;   2388475<br>
+19   &nbsp;&nbsp;&nbsp;   521513<br>
+14   &nbsp;&nbsp;&nbsp;   344977<br>
+1    &nbsp;&nbsp;&nbsp;   321170<br>
+18   &nbsp;&nbsp;&nbsp;   296554<br>
 
-b.
-select Issuer_Precinct,count(*) as IssuedTicket from violations_parking group by Issuer_Precinct order by IssuedTicket desc limit 6;
+### 4. Find the violation code frequency across 3 precincts which have issued the most number of tickets - do these precinct zones have an exceptionally high frequency of certain violation codes?
 
+```
 select Issuer_Precinct,Violation_Code, count(*) as TicketsIssued from park_viol_part_buck  group by Issuer_Precinct, Violation_Code order by TicketsIssued desc limit 7;
-\
+```
+0    &nbsp;&nbsp;&nbsp;   36   &nbsp;&nbsp;&nbsp;   662760<br>
+0    &nbsp;&nbsp;&nbsp;   7    &nbsp;&nbsp;&nbsp;   210171<br>
+0    &nbsp;&nbsp;&nbsp;   21   &nbsp;&nbsp;&nbsp;   126218<br>
+18   &nbsp;&nbsp;&nbsp;   14   &nbsp;&nbsp;&nbsp;   50159<br>
+19   &nbsp;&nbsp;&nbsp;   46   &nbsp;&nbsp;&nbsp;   48451<br>
+0    &nbsp;&nbsp;&nbsp;   5    &nbsp;&nbsp;&nbsp;   48072<br>
+14   &nbsp;&nbsp;&nbsp;   14   &nbsp;&nbsp;&nbsp;   45041<br>
+
+It will not make any sense to consider '0', therefore 18,19 and 14 are the three issuer precincts which have the maximum number of violations. 
+
+##### Issuer Precinct 18:
+
+```
 select Violation_Code, count(*) as TicketsIssued from park_viol_part_buck where Issuer_Precinct=18 group by Violation_Code order by TicketsIssued desc limit 7;
-/
+```
+14   &nbsp;&nbsp;&nbsp;   50159<br>
+69   &nbsp;&nbsp;&nbsp;   20189<br>
+47   &nbsp;&nbsp;&nbsp;   14107<br>
+31   &nbsp;&nbsp;&nbsp;   11894<br>
+46   &nbsp;&nbsp;&nbsp;   7872<br>
+42   &nbsp;&nbsp;&nbsp;   6190<br>
+38   &nbsp;&nbsp;&nbsp;   6176<br>
+
+##### Issuer Precinct 18:
+
+```
 select Violation_Code, count(*) as TicketsIssued from park_viol_part_buck where Issuer_Precinct=19 group by Violation_Code order by TicketsIssued desc limit 7;
-\
+```
+46   &nbsp;&nbsp;&nbsp;   48451<br>
+38   &nbsp;&nbsp;&nbsp;   36386<br>
+37   &nbsp;&nbsp;&nbsp;   36056<br>
+14   &nbsp;&nbsp;&nbsp;   29797<br>
+21   &nbsp;&nbsp;&nbsp;   28413<br>
+20   &nbsp;&nbsp;&nbsp;   14629<br>
+40   &nbsp;&nbsp;&nbsp;   11416<br>
+
+##### Issuer Precinct 14:
+
+```
 select Violation_Code, count(*) as TicketsIssued from park_viol_part_buck where Issuer_Precinct=14 group by Violation_Code order by TicketsIssued desc limit 7;
-/
-select Issuer_Precinct,Violation_Code, count(*) as TicketsIssued from park_viol_part_buck where Issuer_Precinct in (18,19,14) group by Issuer_Precinct,Violation_Code order by TicketsIssued desc limit 10;
+```
+14   &nbsp;&nbsp;&nbsp;   45041<br>
+69   &nbsp;&nbsp;&nbsp;   30464<br>
+31   &nbsp;&nbsp;&nbsp;   22555<br>
+47   &nbsp;&nbsp;&nbsp;   18364<br>
+42   &nbsp;&nbsp;&nbsp;   10027<br>
+46   &nbsp;&nbsp;&nbsp;   7686<br>
+19   &nbsp;&nbsp;&nbsp;   7030<br>
 
+### 5. Find out the properties of parking violations across different times of the day: The Violation Time field is specified in a strange format. Find a way to make this into a time attribute that you can use to divide into groups.
 
-select from_unixtime(unix_timestamp(regexp_extract(violation_time,'(.*)[A-Z]',1),'HHmm'),"HH:mm") as date_data from violations_parking limit 2;
-/
-select from_unixtime(unix_timestamp(concat(violation_time,'M'), 'HHmmaaa'),"HH:mmaaa") as date_data from violations_parking limit 2;
+```
+select from_unixtime(unix_timestamp(regexp_extract(violation_time,'(.*)[A-Z]',1),'HHmm'),"HH:mm") as data from violations_parking limit 7;
+```
+01:43
+04:00
+12:11
+12:17
+12:07
+10:37
+01:01
 
+```
+select from_unixtime(unix_timestamp(concat(violation_time,'M'), 'HHmmaaa'),"HH:mmaaa") as data from violations_parking limit 7;
+```
+01:43AM
+04:00AM
+12:11PM
+12:17PM
+12:07PM
+10:37AM
+01:01AM
 
-
+```
 create view park_viol_part_view partitioned on (Violation_Code) as
 select Summons_Number, Violation_Time, Issuer_Precinct,
 case
@@ -318,7 +392,7 @@ else null end as Violation_Time_bin,Violation_Code
 from park_viol_part_buck
 where Violation_Time is not null or (length(Violation_Time)=5 and upper(substring(Violation_Time,-1))in ('A','P')
 and substring(Violation_Time,1,2) in ('00','01','02','03','04','05','06','07', '08','09','10','11','12'));
-
+```
 
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 1 group by Violation_Code order by TicketsIssued desc limit 3;
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 2 group by Violation_Code order by TicketsIssued desc limit 3;
