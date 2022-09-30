@@ -396,27 +396,62 @@ from park_viol_part_buck
 where Violation_Time is not null or (length(Violation_Time)=5 and upper(substring(Violation_Time,-1))in ('A','P')
 and substring(Violation_Time,1,2) in ('00','01','02','03','04','05','06','07', '08','09','10','11','12'));
 ```
+#### Bin = 1
 ```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 1 group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+21   &nbsp;&nbsp;&nbsp;   36976<br>
+40   &nbsp;&nbsp;&nbsp;   25897<br>
+78   &nbsp;&nbsp;&nbsp;   15550<br>
+
+#### Bin = 2
 ```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 2 group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+14   &nbsp;&nbsp;&nbsp;   74121<br>
+40   &nbsp;&nbsp;&nbsp;   60662<br>
+21   &nbsp;&nbsp;&nbsp;   57928<br>
+
+#### Bin = 3
 ```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 3 group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+21   &nbsp;&nbsp;&nbsp;   598183<br>
+36   &nbsp;&nbsp;&nbsp;   348161<br>
+38   &nbsp;&nbsp;&nbsp;   176573<br>
+
+#### Bin = 4
 ```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 4 group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+36   &nbsp;&nbsp;&nbsp;   286283<br>
+38   &nbsp;&nbsp;&nbsp;   240721<br>
+37   &nbsp;&nbsp;&nbsp;   167026<br>
+
+#### Bin = 5
 ```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 5 group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+38   &nbsp;&nbsp;&nbsp;   102858<br>
+14   &nbsp;&nbsp;&nbsp;   75919<br>
+37   &nbsp;&nbsp;&nbsp;   70345<br>
+
+#### Bin = 6
 ```
 select Violation_Code,count(*) TicketsIssued from park_viol_part_view where Violation_Time_bin == 6 group by Violation_Code order by TicketsIssued desc limit 3;
 ```
+7   &nbsp;&nbsp;&nbsp;    26292<br>
+40   &nbsp;&nbsp;&nbsp;   22361<br>
+14   &nbsp;&nbsp;&nbsp;   21055<br>
+
+### 7. Now, try another direction. For the 3 most commonly occurring violation codes, find the most common times of day (in terms of the bins from the previous part)
 ```
 select Violation_Time_bin, count(*) TicketsIssued from park_viol_part_view where Violation_Code in (21,36,37,38) group by Violation_Time_bin order by TicketsIssued desc limit 3;
 ```
+3    &nbsp;&nbsp;&nbsp;   1173323<br>
+4    &nbsp;&nbsp;&nbsp;   768743<br>
+5    &nbsp;&nbsp;&nbsp;   186997<br>
+
 
 ```
 create view tickets_issued_view as
