@@ -35,7 +35,7 @@ load data inpath '/tmp/assignments/' into table AgentPerformance;
 
 load data inpath '/tmp/assignments/' into table AgentLogingReport;
 ```
-
+The date is put as a string format in the above tanler is needed to be changed to "date" datatype...
 ```
 create table agentloging
 (
@@ -60,7 +60,7 @@ duration
 from AgentLogingReport;
 ```
 
-
+and same for this table too...
 ```
 create table agentperform
 (
