@@ -380,7 +380,7 @@ select from_unixtime(unix_timestamp(concat(violation_time,'M'), 'HHmmaaa'),"HH:m
 
 ### 6. Divide 24 hours into 6 equal discrete bins of time. The intervals you choose are at your discretion. For each of these groups, find the 3 most commonly occurring violations
 
-Create a Partitioned View:
+Create a Partitioned View as views take less space as compared to tables:
 ```
 create view park_viol_part_view partitioned on (Violation_Code) as
 select Summons_Number, Violation_Time, Issuer_Precinct,
