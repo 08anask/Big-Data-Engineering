@@ -1,14 +1,14 @@
-#### Download the dataset from the below mentioned link
+### Download the dataset from the below mentioned link
 https://github.com/shashank-mishra219/Confluent-Kafka-Setup/blob/main/restaurant_orders.csv
 
 
-#### 1. Setup Confluent Kafka Account<br>
+### 1. Setup Confluent Kafka Account<br>
  The Confluent Kafka Account was created with the user mail ID and the account was logged in.
 
-#### 2. Create one kafka topic named as "restaurent-take-away-data" with 3 partitions<br>
+### 2. Create one kafka topic named as "restaurent-take-away-data" with 3 partitions<br>
 Topic named "restaurent-take-away-data" was created in the kafka cluster named as "demo-kafka-cluster" with 3 partitions and the API Key of the cluster was downloaded.
   
-#### 3. Setup key (string) & value (json) schema in the confluent schema registry<br>
+### 3. Setup key (string) & value (json) schema in the confluent schema registry<br>
 The schema of the above mentioned dataset was set as the key was just allocated as "string", whereas the value is needed to be passed in json format as shown below :
 ```
 {
@@ -47,7 +47,7 @@ The schema of the above mentioned dataset was set as the key was just allocated 
 }
 ```
 
-#### 4. Write a kafka producer program (python or any other language) to read data records from restaurent data csv file make sure schema is not hardcoded in the producer code, read the latest version of schema and schema_str from schema registry and use it fordata serialization.
+### 4. Write a kafka producer program (python or any other language) to read data records from restaurent data csv file make sure schema is not hardcoded in the producer code, read the latest version of schema and schema_str from schema registry and use it fordata serialization.
 ``` 
 import pandas as pd
 from uuid import uuid4
@@ -189,7 +189,7 @@ def main(topic):
 
 main("restaurent-take-away-data")
 ```
-#### 5. From producer code, publish data in Kafka Topic one by one and use dynamic key while publishing the records into the Kafka Topic<br>
+### 5. From producer code, publish data in Kafka Topic one by one and use dynamic key while publishing the records into the Kafka Topic<br>
 The producer code was executed from the Command Line Terminal to publish the data into the kafka topic.
  
   
